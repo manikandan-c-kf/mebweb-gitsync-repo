@@ -45,3 +45,9 @@ Outputs:
     Value: !Ref InternetGateway
     Export:
       Name: "InternetGatewayId"
+
+  AttachGatewayID:
+    Description: ID of the attach gateway
+    Value: !Ref AttachGateway
+    Export:
+      Name: "AttachGatewayId"

@@ -17,7 +17,8 @@ Resources:
 
   PublicRoute:
     Type: AWS::EC2::Route
-    DependsOn: AttachGateway
+    # DependsOn: AttachGateway
+    DependsOn: !ImportValue "AttachGatewayId"
     Properties:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
