@@ -53,14 +53,14 @@ Resources:
       EnableDnsSupport: true
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-vpc"
+          Value: !Sub "${AWS::StackName}-vpc-${Environment}"
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-igw"
+          Value: !Sub "${AWS::StackName}-igw-${Environment}"
 
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -77,7 +77,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-public-1"
+          Value: !Sub "${AWS::StackName}-public-1-${Environment}"
 
   PublicSubnet2:
     Type: AWS::EC2::Subnet
@@ -88,7 +88,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-public-2"
+          Value: !Sub "${AWS::StackName}-public-2-${Environment}"
 
   PublicSubnet3:
     Type: AWS::EC2::Subnet
@@ -99,7 +99,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-public-3"
+          Value: !Sub "${AWS::StackName}-public-3-${Environment}"
 
   PublicSubnet4:
     Type: AWS::EC2::Subnet
@@ -110,7 +110,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-public-4"
+          Value: !Sub "${AWS::StackName}-public-4-${Environment}"
 
   PublicSubnet5:
     Type: AWS::EC2::Subnet
@@ -121,7 +121,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-public-5"
+          Value: !Sub "${AWS::StackName}-public-5-${Environment}"
 
   PublicSubnet6:
     Type: AWS::EC2::Subnet
@@ -132,7 +132,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-public-6"
+          Value: !Sub "${AWS::StackName}-public-6-${Environment}"
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
@@ -142,7 +142,7 @@ Resources:
       AvailabilityZone: !Select [0, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-private-1"
+          Value: !Sub "${AWS::StackName}-private-1-${Environment}"
 
   PrivateSubnet2:
     Type: AWS::EC2::Subnet
@@ -152,7 +152,7 @@ Resources:
       AvailabilityZone: !Select [1, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-private-2"
+          Value: !Sub "${AWS::StackName}-private-2-${Environment}"
 
   PrivateSubnet3:
     Type: AWS::EC2::Subnet
@@ -162,7 +162,7 @@ Resources:
       AvailabilityZone: !Select [2, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-private-3"
+          Value: !Sub "${AWS::StackName}-private-3-${Environment}"
 
   PrivateSubnet4:
     Type: AWS::EC2::Subnet
@@ -172,7 +172,7 @@ Resources:
       AvailabilityZone: !Select [3, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-private-4"
+          Value: !Sub "${AWS::StackName}-private-4-${Environment}"
 
   PrivateSubnet5:
     Type: AWS::EC2::Subnet
@@ -182,7 +182,7 @@ Resources:
       AvailabilityZone: !Select [4, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-private-5"
+          Value: !Sub "${AWS::StackName}-private-5-${Environment}"
 
   PrivateSubnet6:
     Type: AWS::EC2::Subnet
@@ -192,7 +192,7 @@ Resources:
       AvailabilityZone: !Select [5, !GetAZs ""]
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-private-6"
+          Value: !Sub "${AWS::StackName}-private-6-${Environment}"
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -200,7 +200,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-public-rt"
+          Value: !Sub "${AWS::StackName}-public-rt-${Environment}"
 
   PublicRoute:
     Type: AWS::EC2::Route
@@ -252,7 +252,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-private-rt"
+          Value: !Sub "${AWS::StackName}-private-rt-${Environment}"
 
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
