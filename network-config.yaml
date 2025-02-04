@@ -1,7 +1,8 @@
-template-file-path: templates/subnets.yaml
+template-file-path: templates/network.yaml
 
 parameters: 
   Environment: dev
+  VpcCidr: 172.29.0.0/16
   PublicSubnet1Cidr: 172.29.0.0/20
   PublicSubnet2Cidr: 172.29.16.0/20
   PublicSubnet3Cidr: 172.29.32.0/20

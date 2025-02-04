@@ -1,4 +1,0 @@
-template-file-path: templates/route-tables.yaml
-
-parameters: 
-  Environment: dev
