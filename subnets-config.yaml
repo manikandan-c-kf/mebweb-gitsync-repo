@@ -1,0 +1,16 @@
+template-file-path: templates/subnets.yaml
+
+parameters: 
+  Environment: dev
+  PublicSubnet1Cidr: 172.29.0.0/20
+  PublicSubnet2Cidr: 172.29.16.0/20
+  PublicSubnet3Cidr: 172.29.32.0/20
+  PublicSubnet4Cidr: 172.29.48.0/20
+  PublicSubnet5Cidr: 172.29.64.0/20
+  PublicSubnet6Cidr: 172.29.80.0/20
+  PrivateSubnet1Cidr: 172.29.96.0/20
+  PrivateSubnet2Cidr: 172.29.112.0/20
+  PrivateSubnet3Cidr: 172.29.128.0/20
+  PrivateSubnet4Cidr: 172.29.144.0/20
+  PrivateSubnet5Cidr: 172.29.160.0/20
+  PrivateSubnet6Cidr: 172.29.176.0/20
