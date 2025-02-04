@@ -26,37 +26,37 @@ Resources:
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [0, !ImportValue PublicSubnetIds ""]
+      SubnetId: !Select [0, !Split [",", !ImportValue PublicSubnetIds]]
       RouteTableId: !Ref PublicRouteTable
 
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [1, !ImportValue PublicSubnetIds ""] 
+      SubnetId: !Select [1, !Split [",", !ImportValue PublicSubnetIds]]
       RouteTableId: !Ref PublicRouteTable
 
   PublicSubnet3RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [2, !ImportValue PublicSubnetIds ""]
+      SubnetId: !Select [2, !Split [",", !ImportValue PublicSubnetIds]]
       RouteTableId: !Ref PublicRouteTable
 
   PublicSubnet4RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [3, !ImportValue PublicSubnetIds ""]
+      SubnetId: !Select [3, !Split [",", !ImportValue PublicSubnetIds]]
       RouteTableId: !Ref PublicRouteTable
 
   PublicSubnet5RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [4, !ImportValue PublicSubnetIds ""]
+      SubnetId: !Select [4, !Split [",", !ImportValue PublicSubnetIds]]
       RouteTableId: !Ref PublicRouteTable
 
   PublicSubnet6RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [5, !ImportValue PublicSubnetIds ""]
+      SubnetId: !Select [5, !Split [",", !ImportValue PublicSubnetIds]]
       RouteTableId: !Ref PublicRouteTable
 
   PrivateRouteTable:
@@ -70,35 +70,35 @@ Resources:
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [0, !ImportValue PrivateSubnetIds ""]
+      SubnetId: !Select [0, !Split [",", !ImportValue PrivateSubnetIds]]
       RouteTableId: !Ref PrivateRouteTable
 
   PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [1, !ImportValue PrivateSubnetIds ""]
+      SubnetId: !Select [1, !Split [",", !ImportValue PrivateSubnetIds]]
       RouteTableId: !Ref PrivateRouteTable
 
   PrivateSubnet3RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [2, !ImportValue PrivateSubnetIds ""]
+      SubnetId: !Select [2, !Split [",", !ImportValue PrivateSubnetIds]]
       RouteTableId: !Ref PrivateRouteTable
 
   PrivateSubnet4RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [3, !ImportValue PrivateSubnetIds ""]
+      SubnetId: !Select [3, !Split [",", !ImportValue PrivateSubnetIds]]
       RouteTableId: !Ref PrivateRouteTable
 
   PrivateSubnet5RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [4, !ImportValue PrivateSubnetIds ""]
+      SubnetId: !Select [4, !Split [",", !ImportValue PrivateSubnetIds]]
       RouteTableId: !Ref PrivateRouteTable
 
   PrivateSubnet6RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Select [5, !ImportValue PrivateSubnetIds ""]
+      SubnetId: !Select [5, !Split [",", !ImportValue PrivateSubnetIds]]
       RouteTableId: !Ref PrivateRouteTable
