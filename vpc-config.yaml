@@ -1,0 +1,9 @@
+template-file-path: templates/vpc.yaml
+
+parameters: 
+  Environment: dev
+  VpcCidr: 172.29.0.0/16
+  
+tags:
+    cost-center: '123456'
+    org: 'AWS'
