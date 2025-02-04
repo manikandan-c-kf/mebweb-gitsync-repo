@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Network Stack for VPC and Subnets
 
 Parameters:
+  Environment:
+    Type: String
   VpcCidr:
     Type: String
     Description: CIDR block for the VPC
