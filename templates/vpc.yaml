@@ -20,9 +20,28 @@ Resources:
         - Key: Name
           Value: !Sub "${AWS::StackName}-vpc-${Environment}"
 
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-igw-${Environment}"
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
 Outputs:
   VPCId:
     Description: The VPC ID
     Value: !Ref VPC
     Export:
       Name: "VpcId"
+
+  InternetGatewayID:
+    Description: ID of the internet gateway
+    Value: !Ref InternetGateway
+    Export:
+      Name: "InternetGatewayId"
