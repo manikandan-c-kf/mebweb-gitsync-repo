@@ -68,71 +68,78 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
-  PublicSubnet1:
-    Type: AWS::EC2::Subnet
+  SubnetCreator:
+    Type: AWS::CloudFormation::CustomResource
     Properties:
+      ServiceToken: arn:aws:lambda:us-east-1:767397811981:function:createSubnets
       VpcId: !Ref VPC
-      CidrBlock: !Ref PublicSubnet1Cidr
-      AvailabilityZone: !Select [0, !GetAZs ""]
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-public-1-${Environment}"
+      SubnetCidrs: "10.0.1.0/24,10.0.2.0/24,10.0.3.0/24,10.0.4.0/24,10.0.5.0/24,10.0.6.0/24"
 
-  PublicSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PublicSubnet2Cidr
-      AvailabilityZone: !Select [1, !GetAZs ""]
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-public-2-${Environment}"
+  # PublicSubnet1:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     VpcId: !Ref VPC
+  #     CidrBlock: !Ref PublicSubnet1Cidr
+  #     AvailabilityZone: !Select [0, !GetAZs ""]
+  #     MapPublicIpOnLaunch: true
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${AWS::StackName}-public-1-${Environment}"
 
-  PublicSubnet3:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PublicSubnet3Cidr
-      AvailabilityZone: !Select [2, !GetAZs ""]
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-public-3-${Environment}"
+  # PublicSubnet2:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     VpcId: !Ref VPC
+  #     CidrBlock: !Ref PublicSubnet2Cidr
+  #     AvailabilityZone: !Select [1, !GetAZs ""]
+  #     MapPublicIpOnLaunch: true
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${AWS::StackName}-public-2-${Environment}"
 
-  PublicSubnet4:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PublicSubnet4Cidr
-      AvailabilityZone: !Select [3, !GetAZs ""]
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-public-4-${Environment}"
+  # PublicSubnet3:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     VpcId: !Ref VPC
+  #     CidrBlock: !Ref PublicSubnet3Cidr
+  #     AvailabilityZone: !Select [2, !GetAZs ""]
+  #     MapPublicIpOnLaunch: true
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${AWS::StackName}-public-3-${Environment}"
 
-  PublicSubnet5:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PublicSubnet5Cidr
-      AvailabilityZone: !Select [4, !GetAZs ""]
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-public-5-${Environment}"
+  # PublicSubnet4:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     VpcId: !Ref VPC
+  #     CidrBlock: !Ref PublicSubnet4Cidr
+  #     AvailabilityZone: !Select [3, !GetAZs ""]
+  #     MapPublicIpOnLaunch: true
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${AWS::StackName}-public-4-${Environment}"
 
-  PublicSubnet6:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PublicSubnet6Cidr
-      AvailabilityZone: !Select [5, !GetAZs ""]
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-public-6-${Environment}"
+  # PublicSubnet5:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     VpcId: !Ref VPC
+  #     CidrBlock: !Ref PublicSubnet5Cidr
+  #     AvailabilityZone: !Select [4, !GetAZs ""]
+  #     MapPublicIpOnLaunch: true
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${AWS::StackName}-public-5-${Environment}"
+
+  # PublicSubnet6:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     VpcId: !Ref VPC
+  #     CidrBlock: !Ref PublicSubnet6Cidr
+  #     AvailabilityZone: !Select [5, !GetAZs ""]
+  #     MapPublicIpOnLaunch: true
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${AWS::StackName}-public-6-${Environment}"
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
