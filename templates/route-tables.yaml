@@ -3,8 +3,8 @@ Description: Route tables Stack to create the public and private route tables
 
 Parameters:
   Environment:
-  Type: String
-  Description: Environment to deploy (dev or staging or production).
+    Type: String
+    Description: Environment to deploy (dev or staging or production).
   
 Resources:
   PublicRouteTable:
