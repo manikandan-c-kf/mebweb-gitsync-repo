@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Network Stack for VPC and Subnets
 
 Parameters:
+  Environment:
+    Type: String
+    Description: Environment to deploy (dev or staging or production).
   VpcCidr:
     Type: String
     Description: CIDR block for the VPC
@@ -15,4 +18,4 @@ Resources:
       EnableDnsSupport: true
       Tags:
         - Key: Name
-          Value: !Sub "${AWS::StackName}-vpc"
+          Value: !Sub "${AWS::StackName}-vpc-${Environment}"
