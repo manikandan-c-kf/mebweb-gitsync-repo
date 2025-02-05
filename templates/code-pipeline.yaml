@@ -325,8 +325,8 @@ Resources:
                 Version: 1
                 Provider: ECS
               Configuration:
-                ClusterName: !ImportValue ECSCluster
-                ServiceName: !ImportValue ECSService
+                ClusterName: !Sub "mebweb-cluster-${Environment}"
+                ServiceName: !Sub "${AWS::StackName}-service-${Environment}"
                 FileName: imagedefinitions.json
               InputArtifacts:
                 - Name: BuildArtifact
