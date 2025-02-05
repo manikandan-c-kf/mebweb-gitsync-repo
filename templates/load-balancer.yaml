@@ -65,14 +65,14 @@ Outputs:
     Description: DNS name of the load balancer
     Value: !GetAtt LoadBalancer.DNSName
     Export:
-      Name: !Sub "${AWS::StackName}-LoadBalancerDNSName"
+      Name: LoadBalancerDNSName
   LoadBalancerArn:
     Description: ARN of the load balancer
     Value: !GetAtt LoadBalancer.LoadBalancerArn
     Export:
-      Name: !Sub "${AWS::StackName}-LoadBalancerArn"
+      Name: LoadBalancerArn
   TargetGroupArn:
     Description: ARN of the target group
     Value: !Ref TargetGroup
     Export:
-      Name: !Sub "${AWS::StackName}-TargetGroupArn"
+      Name: TargetGroupArn
