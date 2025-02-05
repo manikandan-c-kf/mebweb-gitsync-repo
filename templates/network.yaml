@@ -295,7 +295,7 @@ Outputs:
     Description: The VPC ID
     Value: !Ref VPC
     Export:
-      Name: !Sub "${AWS::StackName}-VpcId"
+      Name: "VpcId"
 
   PublicSubnetIds:
     Description: Comma-separated list of public subnet IDs
@@ -308,7 +308,7 @@ Outputs:
         - !Ref PublicSubnet5
         - !Ref PublicSubnet6
     Export:
-      Name: !Sub "${AWS::StackName}-PublicSubnetIds"
+      Name: "PublicSubnetIds"
 
   PrivateSubnetIds:
     Description: Comma-separated list of private subnet IDs
@@ -321,4 +321,4 @@ Outputs:
         - !Ref PrivateSubnet5
         - !Ref PrivateSubnet6
     Export:
-      Name: !Sub "${AWS::StackName}-PrivateSubnetIds"
+      Name: "PrivateSubnetIds"

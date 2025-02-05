@@ -1,0 +1,5 @@
+template-file-path: templates/ecs.yaml
+
+parameters:
+  Environment: dev
+  ECSContainerName: mebweb-container

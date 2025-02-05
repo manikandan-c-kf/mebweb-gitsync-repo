@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ECS Cluster, Service, and Task Definition Configuration
+
+Parameters:
+  Environment:
+    Type: String
+    Description: The environment for which the resources are being created (e.g., dev, prod, staging)
+  PrivateSubnetIds:
+    Type: String
+    Description: Comma-separated list of Private Subnet IDs for ECS tasks
+  SecurityGroupId:
+    Type: String
+    Description: Security Group ID for ECS tasks
+  TaskExecutionRoleArn:
+    Type: String
+    Description: ECS Task Execution Role ARN
+  ECRRepositoryName:
+    Type: String
+    Description: Name of the ECR repository
+  ECSContainerName:
+    Type: String
+    Description: Name of the ECS container
+
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub "mebweb-cluster-${Environment}"
+
+  ECSTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "mebweb-taskdefinition-${Environment}"
+      NetworkMode: awsvpc
+      RequiresCompatibilities: ["FARGATE"]
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !Ref TaskExecutionRoleArn
+      TaskRoleArn: !Ref TaskExecutionRoleArn
+      ContainerDefinitions:
+        - Name: !Sub "${ECSContainerName}-${Environment}"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryName}:latest"
+          PortMappings:
+            - ContainerPort: 80
+              Protocol: tcp
+          Essential: true
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub "/ecs/${AWS::StackName}"
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn: ECSCluster
+    Properties:
+      ServiceName: !Sub "${AWS::StackName}-service-${Environment}"
+      Cluster: !Ref ECSCluster
+      DesiredCount: 0
+      LaunchType: FARGATE
+      TaskDefinition: !Ref ECSTaskDefinition
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Select [0, !Split [",", !ImportValue PrivateSubnetIds]]
+            - !Select [1, !Split [",", !ImportValue PrivateSubnetIds]]
+          SecurityGroups:
+            - !ImportValue  SecurityGroupId
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/ecs/${AWS::StackName}"
+      RetentionInDays: 30
+
+Outputs:
+  ECSClusterName:
+    Description: Name of the ECS cluster
+    Value: !Ref ECSCluster
+    Export:
+      Name: !Sub "${AWS::StackName}-ECSClusterName"
+  ECSServiceName:
+    Description: Name of the ECS Service
+    Value: !Ref ECSService
+    Export:
+      Name: !Sub "${AWS::StackName}-ECSService"
