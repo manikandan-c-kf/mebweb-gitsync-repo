@@ -22,6 +22,8 @@ Parameters:
   CodeStarConnectionArn:
     Type: String
     Description: CodeStarConnectionArn
+  ECRRepositoryName:
+    Type: String
 
 Resources:
   BackendCodeBuildServiceRole:
