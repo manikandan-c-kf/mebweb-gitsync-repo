@@ -3,4 +3,5 @@ template-file-path: templates/s3.yaml
 parameters: 
   Environment: dev
   FrontendBucketName: mebwebfrontend 
-  AccessLogsBucketName: mebwebaccesslogs 
+  AccessLogsBucketName: mebwebaccesslogs
+  BackendArtifactBucketName: mebwebbackendartifact 

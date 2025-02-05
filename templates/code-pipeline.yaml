@@ -24,6 +24,10 @@ Parameters:
     Description: CodeStarConnectionArn
   ECRRepositoryName:
     Type: String
+  ECSContainerName:
+    Type: String
+  BackendArtifactBucketName:
+    Type: String
 
 Resources:
   BackendCodeBuildServiceRole:
@@ -49,7 +53,7 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                   - ecr:GetAuthorizationToken
-              - Resource: !Join ['', ['arn:aws:s3:::', !ImportValue BackendArtifactBucketName, '/*']]
+              - Resource: !Join ['', ['arn:aws:s3:::', !Sub "${BackendArtifactBucketName}", '/*']]
                 Effect: Allow
                 Action:
                   - s3:GetObject
@@ -98,7 +102,7 @@ Resources:
                   - s3:GetObjectVersion
                   - s3:GetBucketVersioning
                   - s3:ListBucket
-                Resource: !Join ['', ['arn:aws:s3:::', !ImportValue BackendArtifactBucketName, '/*']]
+                Resource: !Join ['', ['arn:aws:s3:::', !Sub "${BackendArtifactBucketName}", '/*']]
               - Effect: Allow
                 Action:
                   - ecs:DescribeServices
@@ -271,9 +275,9 @@ Resources:
           - Name: AWS_ACCOUNT_ID
             Value: !Ref AWS::AccountId
           - Name: IMAGE_REPO_NAME
-            Value: !ImportValue ECRRepositoryName
+            Value: !Sub "${ECRRepositoryName}"
           - Name: ECS_CONTAINER_NAME
-            Value: !ImportValue ECSContainerName
+            Value: !Sub "${ECSContainerName}-${Environment}"
       Name: !Ref AWS::StackName
       ServiceRole: !Ref BackendCodeBuildServiceRole
 
@@ -284,7 +288,7 @@ Resources:
       RoleArn: !Sub BackendCodePipelineServiceRole
       ArtifactStore:
         Type: S3
-        Location: !ImportValue BackendArtifactBucketName
+        Location: !Sub "${BackendArtifactBucketName}"
       Stages:
         - Name: Source
           Actions:

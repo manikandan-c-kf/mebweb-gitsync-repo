@@ -12,6 +12,11 @@ Parameters:
     Description: S3 bucket name for storing access logs
     AllowedPattern: "[a-z0-9.-]*"
     ConstraintDescription: "Bucket name can only contain lowercase letters, numbers, dots (.), and hyphens (-)"
+  BackendArtifactBucketName:
+    Type: String
+    Description: S3 bucket name for storing backend function artifacts
+    AllowedPattern: "[a-z0-9.-]*"
+    ConstraintDescription: "Bucket name can only contain lowercase letters, numbers, dots (.), and hyphens (-)"
   Environment:
     Type: String
     Description: Environment to deploy (dev or staging or production).
@@ -119,6 +124,8 @@ Resources:
 
   BackendArtifactBucket:
     Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BackendArtifactBucketName
 
   ArtifactBucketDev:
     Condition: IsDevelopment
