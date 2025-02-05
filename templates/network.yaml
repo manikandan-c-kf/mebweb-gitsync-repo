@@ -68,13 +68,6 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
-  # SubnetCreator:
-  #   Type: AWS::CloudFormation::CustomResource
-  #   Properties:
-  #     ServiceToken: arn:aws:lambda:us-east-1:767397811981:function:createSubnets
-  #     VpcId: !Ref VPC
-  #     SubnetCidrs: "10.0.1.0/24,10.0.2.0/24,10.0.3.0/24,10.0.4.0/24,10.0.5.0/24,10.0.6.0/24"
-
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -329,7 +322,3 @@ Outputs:
         - !Ref PrivateSubnet6
     Export:
       Name: !Sub "${AWS::StackName}-PrivateSubnetIds"
-
-  # PublicSubnetIds:
-  #   Description: "List of Public Subnet IDs"
-  #   Value: !GetAtt SubnetCreator.SubnetIds
