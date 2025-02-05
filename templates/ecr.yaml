@@ -17,7 +17,7 @@ Resources:
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Sub "${ECRRepositoryName}-${Environment}"
+      RepositoryName: !Sub "${ECRRepositoryName}-${!ImportValue Environment}"
 
 Outputs:
   ECRRepositoryURI:
