@@ -5,18 +5,6 @@ Parameters:
   Environment:
     Type: String
     Description: The environment for which the resources are being created (e.g., dev, prod, staging)
-  PrivateSubnetIds:
-    Type: String
-    Description: Comma-separated list of Private Subnet IDs for ECS tasks
-  SecurityGroupId:
-    Type: String
-    Description: Security Group ID for ECS tasks
-  TaskExecutionRoleArn:
-    Type: String
-    Description: ECS Task Execution Role ARN
-  ECRRepositoryName:
-    Type: String
-    Description: Name of the ECR repository
   ECSContainerName:
     Type: String
     Description: Name of the ECS container
@@ -70,7 +58,7 @@ Resources:
             - !Select [0, !Split [",", !ImportValue PrivateSubnetIds]]
             - !Select [1, !Split [",", !ImportValue PrivateSubnetIds]]
           SecurityGroups:
-            - !ImportValue  SecurityGroupId
+            - !ImportValue SecurityGroupId
 
   LogGroup:
     Type: AWS::Logs::LogGroup
