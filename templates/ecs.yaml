@@ -52,7 +52,7 @@ Resources:
       TaskRoleArn: !GetAtt TaskExecutionRole.Arn
       ContainerDefinitions:
         - Name: !Sub "${ECSContainerName}-${Environment}"
-          Image: !ImportValue ECRRepositoryURI
+          Image: !ImportValue ECRRepositoryURI:latest
           PortMappings:
             - ContainerPort: 80
               Protocol: tcp

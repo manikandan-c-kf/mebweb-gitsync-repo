@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to define the environment parameter
+
+Parameters:
+  Environment:
+    Type: String
+    Description: Deployment environment (dev, stage, prod)
+
+Outputs:
+  EnvironmentOutput:
+    Value: !Ref Environment
+    Description: Environment type
+    Export:
+      Name: Environment
