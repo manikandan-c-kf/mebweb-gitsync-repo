@@ -216,7 +216,7 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               Configuration:
-                ProjectName: !Ref SAMCodeBuildProject
+                ProjectName: !Ref SAMCodeBuildProjectStage
               RunOrder: 1
       ArtifactStore:
         Type: S3
@@ -275,7 +275,7 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               Configuration:
-                ProjectName: !Ref SAMCodeBuildProject
+                ProjectName: !Ref SAMCodeBuildProjectProd
               RunOrder: 1
       ArtifactStore:
         Type: S3
