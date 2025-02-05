@@ -12,7 +12,7 @@ Resources:
     Properties:
       Name: CLOUDFRONT_ID
       Type: String
-      Value: !GetAtt CloudfrontStack.Outputs.CloudFrontDistributionId
+      Value: !ImportValue CloudFrontDistributionId
       Description: "CloudFront Distribution ID for the frontend application."
 
   S3BucketParameter:
