@@ -1,0 +1,176 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Helper stack for S3 buckets and related policies
+
+Parameters:
+  FrontendBucketName:
+    Type: String
+    Description: S3 bucket name for frontend static hosting
+    AllowedPattern: "[a-z0-9.-]*"
+    ConstraintDescription: "Bucket name can only contain lowercase letters, numbers, dots (.), and hyphens (-)"
+  AccessLogsBucketName:
+    Type: String
+    Description: S3 bucket name for storing access logs
+    AllowedPattern: "[a-z0-9.-]*"
+    ConstraintDescription: "Bucket name can only contain lowercase letters, numbers, dots (.), and hyphens (-)"
+  Environment:
+    Type: String
+    Description: Environment to deploy (dev or staging or production).
+
+Conditions:
+  IsDevelopment: !Equals [!Ref Environment, dev]
+  IsStaging: !Equals [!Ref Environment, staging]
+  IsProduction: !Equals [!Ref Environment, production]
+
+Mappings:
+  ELBRegionMap:
+    us-east-1:
+      AccountId: "127311923021"
+    us-east-2:
+      AccountId: "033677994240"
+    us-west-1:
+      AccountId: "027434742980"
+    us-west-2:
+      AccountId: "797873946194"
+    eu-west-1:
+      AccountId: "156460612806"
+
+Resources:
+  AccessLogsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref AccessLogsBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: ObjectWriter
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldLogs
+            Status: Enabled
+            ExpirationInDays: 90
+
+  AccessLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AccessLogsBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "AllowELBRootAccount"
+            Effect: Allow
+            Principal:
+              AWS: !Join 
+                - ""
+                - - "arn:aws:iam::"
+                  - !FindInMap [ELBRegionMap, !Ref "AWS::Region", AccountId]
+                  - ":root"
+            Action: "s3:PutObject"
+            Resource: !Sub "${AccessLogsBucket.Arn}/*"
+          - Sid: "AllowELBLogDelivery"
+            Effect: Allow
+            Principal:
+              Service: "delivery.logs.amazonaws.com"
+            Action: "s3:PutObject"
+            Resource: !Sub "${AccessLogsBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                "s3:x-amz-acl": "bucket-owner-full-control"
+          - Sid: "AllowELBLogDeliveryAcl"
+            Effect: Allow
+            Principal:
+              Service: "delivery.logs.amazonaws.com"
+            Action: "s3:GetBucketAcl"
+            Resource: !GetAtt AccessLogsBucket.Arn
+
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref FrontendBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: false
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "PublicReadGetObject"
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::${FrontendBucket}/*"
+
+  BackendArtifactBucket:
+    Type: AWS::S3::Bucket
+
+  ArtifactBucketDev:
+    Condition: IsDevelopment
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'codepipeline-${AWS::Region}-${AWS::AccountId}-dev'
+
+  ArtifactBucketStage:
+    Condition: IsStaging
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'codepipeline-${AWS::Region}-${AWS::AccountId}-stage'
+
+  ArtifactBucketProd:
+    Condition: IsProduction
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'codepipeline-${AWS::Region}-${AWS::AccountId}-prod'
+
+Outputs:
+  FrontendBucketName:
+    Description: Name of the frontend bucket
+    Value: !Ref FrontendBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-FrontendBucketName"
+  AccessLogsBucketName:
+    Description: Name of the access logs bucket
+    Value: !Ref AccessLogsBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-AccessLogsBucketName"
+  FrontendBucketWebsiteURL:
+    Description: URL for website hosted on S3
+    Value: !GetAtt FrontendBucket.WebsiteURL
+    Export:
+      Name: !Sub "${AWS::StackName}-FrontendBucketWebsiteURL"
+  BackendArtifactBucket:
+    Description: Backend Artifact Bucket
+    Value: !Ref BackendArtifactBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-BackendArtifactBucketName"
+  ArtifactBucketDevName:
+    Condition: IsDevelopment
+    Value: !Ref ArtifactBucketDev
+    Export:
+      Name: ArtifactBucketDev
+  ArtifactBucketStageName:
+    Condition: IsStaging
+    Value: !Ref ArtifactBucketStage
+    Export:
+      Name: ArtifactBucketStage
+  ArtifactBucketProdName:
+    Condition: IsProduction
+    Value: !Ref ArtifactBucketProd
+    Export:
+      Name: ArtifactBucketProd
