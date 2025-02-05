@@ -96,9 +96,14 @@ Outputs:
     Description: Name of the ECS cluster
     Value: !Ref ECSCluster
     Export:
-      Name: !Sub "${AWS::StackName}-ECSClusterName"
+      Name: ECSCluster
   ECSServiceName:
     Description: Name of the ECS Service
     Value: !Ref ECSService
     Export:
-      Name: !Sub "${AWS::StackName}-ECSService"
+      Name: ECSService
+  ECSContainerName:
+    Description: Name of the ECS Container
+    Value: !Sub "${ECSContainerName}-${Environment}"
+    Export:
+      Name: ECSContainerName

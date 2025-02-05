@@ -1,0 +1,331 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Code pipeline Stack for front end and back end.
+
+Parameters:
+  Environment:
+    Type: String
+  FrontendGitHubRepositoryName:
+    Type: String
+    Description: GitHub repository name for front end
+  FrontendGitHubBranchName:
+    Type: String
+    Description: GitHub branch name for front end
+  FrontendBucketName:
+    Type: String
+    Description: S3 bucket name for front end  
+  BackendGitHubRepositoryName:
+    Type: String
+    Description: GitHub repository name for back end
+  BackendGitHubBranchName:
+    Type: String
+    Description: GitHub branch name for back end
+  CodeStarConnectionArn:
+    Type: String
+    Description: CodeStarConnectionArn
+
+Resources:
+  BackendCodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: BackendBuildPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - ecr:GetAuthorizationToken
+              - Resource: !Join ['', ['arn:aws:s3:::', !ImportValue BackendArtifactBucketName, '/*']]
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetObjectVersion
+              - Resource:
+                  - !ImportValue ECRRepositoryURI
+                Effect: Allow
+                Action:
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:PutImage
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
+                  - ecr:GetAuthorizationToken
+                  - ecr:ListImages
+                  - ecr:DescribeRepositories
+              - Resource:
+                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:read-env-mebweb-${Environment}"
+                Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+
+  BackendCodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: BackendPipelinePermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+                  - s3:ListBucket
+                Resource: !Join ['', ['arn:aws:s3:::', !ImportValue BackendArtifactBucketName, '/*']]
+              - Effect: Allow
+                Action:
+                  - ecs:DescribeServices
+                  - ecs:DescribeTaskDefinition
+                  - ecs:DescribeTasks
+                  - ecs:ListTasks
+                  - ecs:RegisterTaskDefinition
+                  - ecs:UpdateService
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                Resource: !Sub "${CodeStarConnectionArn}"
+
+  FrontendCodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodeBuildPermissions
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::${FrontendBucketName}
+                  - !Sub arn:aws:s3:::${FrontendBucketName}/*
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
+              - Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                Resource:
+                  - Fn::ImportValue: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistributionId}
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CLOUDFRONT_ID"
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/S3_BUCKET"
+
+  FrontendCodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodePipelinePermissions
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::${FrontendBucketName}
+                  - !Sub arn:aws:s3:::${FrontendBucketName}/*
+              - Effect: Allow
+                Action:
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                Resource: !Sub "${CodeStarConnectionArn}"
+
+  FrontendCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: FrontendDeploymentBuild
+      Source:
+        BuildSpec: "buildspec.yaml"
+        Type: CODEPIPELINE
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+        Type: LINUX_CONTAINER
+      ServiceRole: !ImportValue "FrontendCodeBuildServiceRole"
+
+  FrontendCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: "Frontend-Code-Pipeline"
+      RoleArn: !ImportValue "FrontendCodePipelineServiceRole"
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHubSource
+              ActionTypeId:
+                Category: "Source"
+                Owner: "AWS"
+                Provider: "CodeStarSourceConnection"
+                Version: "1"
+              OutputArtifacts:
+                - Name: SourceOutput
+              Configuration:
+                BranchName: !Sub "${FrontendGitHubBranchName}"
+                ConnectionArn: !Sub ${CodeStarConnectionArn}
+                FullRepositoryId: !Sub "${FrontendGitHubRepositoryName}"
+                OutputArtifactFormat: "CODE_ZIP"
+              RunOrder: 1
+
+        - Name: BuildAndDeploy
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+              Configuration:
+                ProjectName: !Ref FrontendCodeBuildProject
+              RunOrder: 1
+      ArtifactStore:
+        Type: S3
+        Location: !Sub "${FrontendBucketName}"
+
+  BackendCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: "buildspec.yaml"
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: AWS_DEFAULT_REGION
+            Value: !Ref AWS::Region
+          - Name: REPOSITORY_URI
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${BackendGitHubRepositoryName}
+          - Name: AWS_ACCOUNT_ID
+            Value: !Ref AWS::AccountId
+          - Name: IMAGE_REPO_NAME
+            Value: !ImportValue ECRRepositoryName
+          - Name: ECS_CONTAINER_NAME
+            Value: !ImportValue ECSContainerName
+      Name: !Ref AWS::StackName
+      ServiceRole: !Ref BackendCodeBuildServiceRole
+
+  BackendPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: "Backend-Code-Pipeline"
+      RoleArn: !ImportValue "BackendCodePipelineServiceRole"
+      ArtifactStore:
+        Type: S3
+        Location: !ImportValue BackendArtifactBucketName
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHubSource
+              ActionTypeId:
+                Category: "Source"
+                Owner: "AWS"
+                Provider: "CodeStarSourceConnection"
+                Version: "1"
+              Configuration:
+                BranchName: !Sub "${BackendGitHubBranchName}"
+                ConnectionArn: !Sub ${CodeStarConnectionArn}
+                FullRepositoryId: !Sub "${BackendGitHubRepositoryName}"
+              OutputArtifacts:
+                - Name: SourceArtifact
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref BackendCodeBuildProject
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts:
+                - Name: BuildArtifact
+              RunOrder: 1
+        - Name: Deploy
+          Actions:
+            - Name: Deploy
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: ECS
+              Configuration:
+                ClusterName: !ImportValue ECSCluster
+                ServiceName: !ImportValue ECSService
+                FileName: imagedefinitions.json
+              InputArtifacts:
+                - Name: BuildArtifact
+              RunOrder: 1

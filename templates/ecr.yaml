@@ -25,3 +25,8 @@ Outputs:
     Value: !GetAtt ECRRepository.RepositoryUri
     Export:
       Name: "ECRRepositoryURI"
+  ECRRepositoryName:
+    Description: Name of the ECR repository
+    Value: !Sub "${ECRRepositoryName}-${Environment}"
+    Export:
+      Name: "ECRRepositoryName"
