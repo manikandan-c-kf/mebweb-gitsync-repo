@@ -1,4 +1,0 @@
-template-file-path: templates/environment.yaml
-
-parameters:
-  Environment: dev

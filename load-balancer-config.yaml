@@ -1,0 +1,4 @@
+template-file-path: templates/load-balancer.yaml
+
+parameters:
+  Environment: dev
