@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: SQS Queue for background jobs with Dead Letter Queue
+
+Parameters:
+  QueueName:
+    Type: String
+    Description: Name of the primary SQS queue
+  DLQName:
+      Type: String
+      Description: Name of the Dead Letter Queue
+  MessageRetentionPeriod:
+      Type: Number
+      Description: Retention period for messages in the primary queue (in seconds)
+  MaxReceiveCount:
+      Type: Number
+      Description: Number of times a message can be received before moving to the DLQ
+
+Resources:
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref DLQName
+      MessageRetentionPeriod: 1209600
+
+  DeadLetterQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref DeadLetterQueue
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "sqs:SendMessage"
+            Resource: !GetAtt DeadLetterQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: "*"
+
+  BackgroundJobQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref QueueName
+      MessageRetentionPeriod: !Ref MessageRetentionPeriod
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: !Ref MaxReceiveCount
+
+Outputs:
+  BackgroundJobQueueArn:
+    Description: ARN of the Background Job SQS Queue
+    Value: !GetAtt BackgroundJobQueue.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-BackgroundJobQueueArn"
+
+  BackgroundJobQueueUrl:
+    Description: URL of the Background Job SQS Queue
+    Value: !Ref BackgroundJobQueue
+    Export:
+      Name: !Sub "${AWS::StackName}-BackgroundJobQueueUrl"
+
+  DeadLetterQueueArn:
+    Description: ARN of the Dead Letter SQS Queue
+    Value: !GetAtt DeadLetterQueue.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-DeadLetterQueueArn"
+
+  DeadLetterQueueUrl:
+    Description: URL of the Dead Letter SQS Queue
+    Value: !Ref DeadLetterQueue
+    Export:
+      Name: !Sub "${AWS::StackName}-DeadLetterQueueUrl"
