@@ -4,4 +4,4 @@ parameters:
   Environment: dev
   SAMGitHubRepositoryName: manikandan-c-kf/sam-lambda
   SAMGitHubBranchName: main 
-  CodeStarConnectionArn: arn:aws:codeconnections:us-east-1:767397811981:connection/24622001-1e83-4559-af0c-d0a09a997a40  
+  CodeStarConnectionArn: arn:aws:codeconnections:us-east-1:767397811981:connection/1bfec851-eda0-4a60-bd54-31f73770815f  
