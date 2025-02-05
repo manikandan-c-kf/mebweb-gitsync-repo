@@ -1,4 +1,4 @@
 template-file-path: templates/security_group.yaml
 
 parameters:
-  VpcId: test
+  VpcId: !stack_output ../vpc/stack.yaml::VpcId
