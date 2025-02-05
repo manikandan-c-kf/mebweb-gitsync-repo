@@ -143,22 +143,22 @@ Outputs:
     Description: Name of the frontend bucket
     Value: !Ref FrontendBucket
     Export:
-      Name: !Sub "${AWS::StackName}-FrontendBucketName"
+      Name: FrontendBucketName
   AccessLogsBucketName:
     Description: Name of the access logs bucket
     Value: !Ref AccessLogsBucket
     Export:
-      Name: !Sub "${AWS::StackName}-AccessLogsBucketName"
+      Name: AccessLogsBucketName
   FrontendBucketWebsiteURL:
     Description: URL for website hosted on S3
     Value: !GetAtt FrontendBucket.WebsiteURL
     Export:
-      Name: !Sub "${AWS::StackName}-FrontendBucketWebsiteURL"
+      Name: FrontendBucketWebsiteURL
   BackendArtifactBucket:
     Description: Backend Artifact Bucket
     Value: !Ref BackendArtifactBucket
     Export:
-      Name: !Sub "${AWS::StackName}-BackendArtifactBucketName"
+      Name: BackendArtifactBucketName
   ArtifactBucketDevName:
     Condition: IsDevelopment
     Value: !Ref ArtifactBucketDev
