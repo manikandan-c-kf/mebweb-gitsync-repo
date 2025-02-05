@@ -151,7 +151,7 @@ Resources:
                 Action:
                   - cloudfront:CreateInvalidation
                 Resource:
-                  - Fn::ImportValue: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/E1OHQ6FWPQMHRK
+                  - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/E1OHQ6FWPQMHRK
               - Effect: Allow
                 Action:
                   - ssm:GetParameter
