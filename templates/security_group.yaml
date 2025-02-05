@@ -19,7 +19,7 @@ Resources:
 
 Outputs:
   SecurityGroupId:
-    Description: ID of the Security Group
+    Description: ID of the created Security Group
     Value: !Ref ApplicationSecurityGroup
     Export:
       Name: "SecurityGroupId"
