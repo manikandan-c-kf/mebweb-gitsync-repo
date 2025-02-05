@@ -54,7 +54,7 @@ Resources:
                   - s3:PutObject
                   - s3:GetObjectVersion
               - Resource:
-                  - !ImportValue ECRRepositoryURI
+                  - !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryName}-${Environment}"
                 Effect: Allow
                 Action:
                   - ecr:GetDownloadUrlForLayer
