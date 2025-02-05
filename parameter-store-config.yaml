@@ -1,0 +1,4 @@
+template-file-path: templates/parameter-store.yaml
+
+parameters:
+  FrontendBucketName: mebwebfrontend 

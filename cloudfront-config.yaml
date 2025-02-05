@@ -1,0 +1,4 @@
+template-file-path: templates/cloudfront.yaml
+
+Parameters:
+  FrontendBucketName: mebwebfrontend 
