@@ -1,7 +1,7 @@
 template-file-path: templates/sam_pipeline.yaml
 
 parameters: 
-  Environment:
-  SAMGitHubRepositoryName:
-  SAMGitHubBranchName: 
-  CodeStarConnectionArn:  
+  Environment: dev
+  SAMGitHubRepositoryName: manikandan-c-kf/sam-lambda
+  SAMGitHubBranchName: main 
+  CodeStarConnectionArn: arn:aws:codeconnections:us-east-1:767397811981:connection/24622001-1e83-4559-af0c-d0a09a997a40  
