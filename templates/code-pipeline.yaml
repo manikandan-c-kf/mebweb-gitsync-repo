@@ -22,12 +22,6 @@ Parameters:
   CodeStarConnectionArn:
     Type: String
     Description: CodeStarConnectionArn
-  ECRRepositoryName:
-    Type: String
-  ECSContainerName:
-    Type: String
-  BackendArtifactBucketName:
-    Type: String
 
 Resources:
   BackendCodeBuildServiceRole:
@@ -53,14 +47,14 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                   - ecr:GetAuthorizationToken
-              - Resource: !Join ['', ['arn:aws:s3:::', !Sub "${BackendArtifactBucketName}", '/*']]
+              - Resource: !Join ['', ['arn:aws:s3:::', !ImportValue BackendArtifactBucketName, '/*']]
                 Effect: Allow
                 Action:
                   - s3:GetObject
                   - s3:PutObject
                   - s3:GetObjectVersion
               - Resource:
-                  - !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryName}-${Environment}"
+                  - !ImportValue ECRRepositoryURI
                 Effect: Allow
                 Action:
                   - ecr:GetDownloadUrlForLayer
@@ -102,7 +96,7 @@ Resources:
                   - s3:GetObjectVersion
                   - s3:GetBucketVersioning
                   - s3:ListBucket
-                Resource: !Join ['', ['arn:aws:s3:::', !Sub "${BackendArtifactBucketName}", '/*']]
+                Resource: !Join ['', ['arn:aws:s3:::', !ImportValue BackendArtifactBucketName, '/*']]
               - Effect: Allow
                 Action:
                   - ecs:DescribeServices
@@ -157,7 +151,7 @@ Resources:
                 Action:
                   - cloudfront:CreateInvalidation
                 Resource:
-                  - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/E1OHQ6FWPQMHRK
+                  - Fn::ImportValue: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/E1OHQ6FWPQMHRK
               - Effect: Allow
                 Action:
                   - ssm:GetParameter
@@ -275,9 +269,9 @@ Resources:
           - Name: AWS_ACCOUNT_ID
             Value: !Ref AWS::AccountId
           - Name: IMAGE_REPO_NAME
-            Value: !Sub "${ECRRepositoryName}"
+            Value: !ImportValue ECRRepositoryName
           - Name: ECS_CONTAINER_NAME
-            Value: !Sub "${ECSContainerName}-${Environment}"
+            Value: !ImportValue ECSContainerName
       Name: !Ref AWS::StackName
       ServiceRole: !Ref BackendCodeBuildServiceRole
 
@@ -285,10 +279,10 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: "Backend-Code-Pipeline"
-      RoleArn: !Sub BackendCodePipelineServiceRole
+      RoleArn: !Sub BackendCodePipelineServiceRole"
       ArtifactStore:
         Type: S3
-        Location: !Sub "${BackendArtifactBucketName}"
+        Location: !ImportValue BackendArtifactBucketName
       Stages:
         - Name: Source
           Actions:
@@ -329,8 +323,8 @@ Resources:
                 Version: 1
                 Provider: ECS
               Configuration:
-                ClusterName: !Sub "mebweb-cluster-${Environment}"
-                ServiceName: !Sub "${AWS::StackName}-service-${Environment}"
+                ClusterName: !ImportValue ECSCluster
+                ServiceName: !ImportValue ECSService
                 FileName: imagedefinitions.json
               InputArtifacts:
                 - Name: BuildArtifact
