@@ -4,7 +4,17 @@ Description: Stack to define the environment parameter
 Parameters:
   Environment:
     Type: String
+    AllowedValues: ["dev", "stage", "prod"]
     Description: Deployment environment (dev, stage, prod)
+
+Resources:
+  EnvironmentParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: "/config/Environment"
+      Type: String
+      Value: !Ref Environment
+      Description: "Deployment environment (dev, stage, prod)"
 
 Outputs:
   EnvironmentOutput:
