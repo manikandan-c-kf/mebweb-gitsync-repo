@@ -1,0 +1,5 @@
+template-file-path: templates/ecr.yaml
+
+parameters:
+  Environment: dev
+  ECRRepositoryName: "mebweb-ecr-repository"

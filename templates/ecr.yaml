@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ECR Repository Configuration
+
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment name, used as a prefix for resources
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+  ECRRepositoryName:
+    Type: String
+    Description: Name of the ECR repository
+
+Resources:
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${ECRRepositoryName}-${Environment}"
+
+Outputs:
+  ECRRepositoryURI:
+    Description: URI of the ECR repository
+    Value: !GetAtt ECRRepository.RepositoryUri
+    Export:
+      Name: "ECRRepositoryURI"
