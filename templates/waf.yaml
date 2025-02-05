@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: WAF WebACL for ALB
+
+Resources:
+  IPSet:
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Addresses:
+        - 192.0.2.0/24
+        - 198.51.100.0/24
+      IPAddressVersion: IPV4
+      Scope: REGIONAL
+      Name: !Sub "meb-${AWS::Region}-ipset"
+      Description: "IPSet for blocking bad IPs"
+      Tags:
+        - Key: Name
+          Value: !Sub "meb-${AWS::Region}-ipset"
+
+  WebACL:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      DefaultAction:
+        Allow: {}
+      Scope: REGIONAL
+      VisibilityConfig:
+        CloudWatchMetricsEnabled: true
+        MetricName: WebACLMetric
+        SampledRequestsEnabled: true
+      Name: !Sub "meb-${AWS::Region}-webacl"
+      Rules:
+        - Name: BlockBadIps
+          Priority: 1
+          Action:
+            Block: {}
+          Statement:
+            IPSetReferenceStatement:
+              Arn: !GetAtt IPSet.Arn
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: BlockBadIps
+            SampledRequestsEnabled: true
+        - Name: RateLimit
+          Priority: 2
+          Action:
+            Block: {}
+          Statement:
+            RateBasedStatement:
+              Limit: 2000
+              AggregateKeyType: IP
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: RateLimit
+            SampledRequestsEnabled: true
+
+  WebACLAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      ResourceArn: !ImportValue LoadBalancerArn
+      WebACLArn: !GetAtt WebACL.Arn
+
+Outputs:
+  WebACLArn:
+    Description: ARN of the WebACL
+    Value: !Ref WebACL
+    Export:
+      Name: !Sub "${AWS::StackName}-WebACLArn"
