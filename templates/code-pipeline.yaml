@@ -22,6 +22,8 @@ Parameters:
   CodeStarConnectionArn:
     Type: String
     Description: CodeStarConnectionArn
+  CloudFrontID:
+    Type: String
 
 Resources:
   BackendCodeBuildServiceRole:
@@ -151,7 +153,7 @@ Resources:
                 Action:
                   - cloudfront:CreateInvalidation
                 Resource:
-                  - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/E1OHQ6FWPQMHRK
+                  - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontID}
               - Effect: Allow
                 Action:
                   - ssm:GetParameter

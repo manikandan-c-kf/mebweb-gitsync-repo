@@ -8,3 +8,4 @@ parameters:
   BackendGitHubRepositoryName: manikandan-c-kf/test-mebweb-backend
   BackendGitHubBranchName: main
   CodeStarConnectionArn: arn:aws:codeconnections:us-east-1:767397811981:connection/96833795-1cf4-40e6-9e89-56c098ee9af2
+  CloudFrontID: CLOUDFRONT_ID
