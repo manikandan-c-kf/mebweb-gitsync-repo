@@ -281,7 +281,7 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: "Backend-Code-Pipeline"
-      RoleArn: !Sub BackendCodePipelineServiceRole"
+      RoleArn: !Ref BackendCodePipelineServiceRole
       ArtifactStore:
         Type: S3
         Location: !ImportValue BackendArtifactBucketName
