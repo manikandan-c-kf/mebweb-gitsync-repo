@@ -275,7 +275,7 @@ Resources:
           - Name: ECS_CONTAINER_NAME
             Value: !ImportValue ECSContainerName
       Name: !Ref AWS::StackName
-      ServiceRole: !Ref BackendCodeBuildServiceRole
+      ServiceRole: !GetAtt BackendCodeBuildServiceRole.Arn
 
   BackendPipeline:
     Type: AWS::CodePipeline::Pipeline
