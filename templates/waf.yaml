@@ -28,29 +28,18 @@ Resources:
         SampledRequestsEnabled: true
       Name: !Sub "meb-${AWS::Region}-webacl"
       Rules:
-        - Name: BlockBadIps
-          Priority: 1
-          Action:
-            Block: {}
-          Statement:
-            IPSetReferenceStatement:
-              Arn: !GetAtt IPSet.Arn
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: BlockBadIps
-            SampledRequestsEnabled: true
-        - Name: RateLimit
-          Priority: 2
-          Action:
-            Block: {}
-          Statement:
-            RateBasedStatement:
-              Limit: 2000
-              AggregateKeyType: IP
-          VisibilityConfig:
-            CloudWatchMetricsEnabled: true
-            MetricName: RateLimit
-            SampledRequestsEnabled: true
+      - Name: AWSManagedRulesBotControlRuleSet
+        Priority: 1
+        Statement:
+          ManagedRuleGroupStatement:
+            VendorName: AWS
+            Name: AWSManagedRulesBotControlRuleSet
+        OverrideAction:
+          None: {} # Uses default action from the rule group
+        VisibilityConfig:
+          CloudWatchMetricsEnabled: true
+          MetricName: AWSManagedRulesBotControlRuleSet
+          SampledRequestsEnabled: true
 
   WebACLAssociation:
     Type: AWS::WAFv2::WebACLAssociation
