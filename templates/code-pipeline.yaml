@@ -58,7 +58,7 @@ Resources:
                   - s3:PutObject
                   - s3:GetObjectVersion
               - Resource:
-                  - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ECRRepositoryName}"
+                  - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ECRRepositoryName}-${Environment}"
                 Effect: Allow
                 Action:
                   - ecr:GetDownloadUrlForLayer
@@ -273,7 +273,7 @@ Resources:
           - Name: AWS_ACCOUNT_ID
             Value: !Ref AWS::AccountId
           - Name: IMAGE_REPO_NAME
-            Value: !Sub "${ECRRepositoryName}"
+            Value: !Sub "${ECRRepositoryName}-${Environment}"
           - Name: ECS_CONTAINER_NAME
             Value: !ImportValue ECSContainerName
       Name: !Ref AWS::StackName
