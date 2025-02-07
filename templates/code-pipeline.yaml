@@ -154,7 +154,6 @@ Resources:
                   - cloudfront:CreateInvalidation
                 Resource:
                     - !Join ["", [ !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/", !ImportValue CloudFrontDistributionId]] 
-                # Resource: "*"
               - Effect: Allow
                 Action:
                   - ssm:GetParameter
