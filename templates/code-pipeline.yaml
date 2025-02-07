@@ -22,8 +22,6 @@ Parameters:
   CodeStarConnectionArn:
     Type: String
     Description: CodeStarConnectionArn
-  CloudFrontID:
-    Type: String
   ECRRepositoryName:
     Type: String
 
