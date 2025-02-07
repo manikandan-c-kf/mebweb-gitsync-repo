@@ -2,6 +2,28 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: WAF WebACL for ALB
 
 Resources:
+  WAFLoggingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-WAFLoggingRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: wafv2.amazonaws.com
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: WAFLoggingPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt WAFLogGroup.Arn
+
   IPSet:
     Type: AWS::WAFv2::IPSet
     Properties:
@@ -35,7 +57,7 @@ Resources:
             VendorName: AWS
             Name: AWSManagedRulesBotControlRuleSet
         OverrideAction:
-          None: {} # Uses default action from the rule group
+          None: {}
         VisibilityConfig:
           CloudWatchMetricsEnabled: true
           MetricName: AWSManagedRulesBotControlRuleSet
@@ -46,6 +68,27 @@ Resources:
     Properties:
       ResourceArn: !ImportValue LoadBalancerArn
       WebACLArn: !GetAtt WebACL.Arn
+
+  WAFLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/waf/${AWS::StackName}-waf-logs"
+      RetentionInDays: 30
+
+  WAFLoggingConfiguration:
+    Type: AWS::WAFv2::LoggingConfiguration
+    Properties:
+      LogDestinationConfigs:
+        - !GetAtt WAFLogGroup.Arn
+      ResourceArn: !GetAtt WebACL.Arn
+      LoggingFilter:
+        DefaultBehavior: KEEP
+        Filters:
+          - Behavior: KEEP
+            Requirement: MEETS_ANY
+            Conditions:
+              - ActionCondition:
+                  Action: BLOCK
 
 Outputs:
   WebACLArn:
