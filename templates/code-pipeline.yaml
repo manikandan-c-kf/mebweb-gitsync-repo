@@ -24,6 +24,8 @@ Parameters:
     Description: CodeStarConnectionArn
   CloudFrontID:
     Type: String
+  ECRRepositoryName:
+    Type: String
 
 Resources:
   BackendCodeBuildServiceRole:
@@ -56,7 +58,7 @@ Resources:
                   - s3:PutObject
                   - s3:GetObjectVersion
               - Resource:
-                  - !ImportValue ECRRepositoryURI
+                  - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ECRRepositoryName}"
                 Effect: Allow
                 Action:
                   - ecr:GetDownloadUrlForLayer
@@ -271,11 +273,11 @@ Resources:
           - Name: AWS_ACCOUNT_ID
             Value: !Ref AWS::AccountId
           - Name: IMAGE_REPO_NAME
-            Value: !ImportValue ECRRepositoryName
+            Value: !Sub "${ECRRepositoryName}"
           - Name: ECS_CONTAINER_NAME
             Value: !ImportValue ECSContainerName
       Name: !Ref AWS::StackName
-      ServiceRole: !GetAtt BackendCodeBuildServiceRole.Arn
+      ServiceRole: !Ref BackendCodeBuildServiceRole
 
   BackendPipeline:
     Type: AWS::CodePipeline::Pipeline
