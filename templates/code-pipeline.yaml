@@ -152,10 +152,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - cloudfront:CreateInvalidation
-                Resource:
-                  - !Sub 
-                    - arn:aws:cloudfront::${AWS::AccountId}:distribution/${distributionId}
-                    - distributionId: !ImportValue CloudFrontDistributionId
+                Resource: "*"
               - Effect: Allow
                 Action:
                   - ssm:GetParameter
