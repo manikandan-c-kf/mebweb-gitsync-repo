@@ -215,7 +215,7 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: "Frontend-Code-Pipeline"
-      RoleArn: !Ref FrontendCodePipelineServiceRole
+      RoleArn: !GetAtt FrontendCodePipelineServiceRole.Arn
       Stages:
         - Name: Source
           Actions:
