@@ -95,6 +95,15 @@ Resources:
                 Action:
                   - codestar-connections:UseConnection
                 Resource: !Sub "${CodeStarConnectionArn}"
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetBucketLocation
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub arn:aws:s3:::${FrontendCodeBucket}
+                  - !Sub arn:aws:s3:::${FrontendCodeBucket}/*
 
   FrontendCodeBuildProject:
     Type: AWS::CodeBuild::Project
