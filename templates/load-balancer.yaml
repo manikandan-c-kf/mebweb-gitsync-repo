@@ -47,7 +47,7 @@ Resources:
         - Key: "deletion_protection.enabled"
           Value: "false"
         - Key: "idle_timeout.timeout_seconds"
-          Value: "60"
+          Value: "300"
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
