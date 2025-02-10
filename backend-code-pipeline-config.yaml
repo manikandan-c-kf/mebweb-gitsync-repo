@@ -1,10 +1,7 @@
-template-file-path: templates/code-pipeline.yaml
+template-file-path: templates/pipeline/backend-code-pipeline.yaml
 
 parameters:
   Environment: dev
-  FrontendGitHubRepositoryName: manikandan-c-kf/test-mebweb-frontend
-  FrontendGitHubBranchName: main
-  FrontendBucketName: mebwebfrontend 
   BackendGitHubRepositoryName: manikandan-c-kf/test-mebweb-backend
   BackendGitHubBranchName: main
   CodeStarConnectionArn: arn:aws:codeconnections:us-east-1:767397811981:connection/96833795-1cf4-40e6-9e89-56c098ee9af2
