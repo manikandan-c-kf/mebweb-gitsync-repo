@@ -79,7 +79,7 @@ Resources:
     Type: AWS::WAFv2::LoggingConfiguration
     Properties:
       LogDestinationConfigs:
-        - !GetAtt WAFLogGroup.Arn
+        - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/waf/${AWS::StackName}-waf-logs:*"
       ResourceArn: !GetAtt WebACL.Arn
       LoggingFilter:
         DefaultBehavior: KEEP
@@ -89,6 +89,7 @@ Resources:
             Conditions:
               - ActionCondition:
                   Action: BLOCK
+
 
 Outputs:
   WebACLArn:
