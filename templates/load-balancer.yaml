@@ -49,11 +49,11 @@ Resources:
         - Key: "idle_timeout.timeout_seconds"
           Value: "60"
 
-  SSLCertificate:
-    Type: AWS::CertificateManager::Certificate
-    Properties:
-      DomainName: www.example.com # !GetAtt LoadBalancer.DNSName
-      ValidationMethod: DNS
+  # SSLCertificate:
+  #   Type: AWS::CertificateManager::Certificate
+  #   Properties:
+  #     DomainName: www.example.com # !GetAtt LoadBalancer.DNSName
+  #     ValidationMethod: DNS
 
   TargetGroupHTTP:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -115,8 +115,8 @@ Resources:
       LoadBalancerArn: !Ref LoadBalancer
       Port: 443
       Protocol: HTTPS
-      Certificates:
-        - CertificateArn: !Ref SSLCertificate
+      # Certificates:
+      #   - CertificateArn: !Ref SSLCertificate
 
 Outputs:
   LoadBalancerDNSName:
