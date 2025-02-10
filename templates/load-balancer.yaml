@@ -67,6 +67,7 @@ Resources:
       TargetGroupAttributes:
         - Key: "deregistration_delay.timeout_seconds"
           Value: "30"
+      LoadBalancingAlgorithm: leastoutstandingrequests
 
   Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
