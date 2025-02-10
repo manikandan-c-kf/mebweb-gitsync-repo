@@ -108,6 +108,21 @@ Resources:
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - "*"  # Allows access from any origin; replace with specific domains if needed
+            AllowedMethods:
+              - GET
+              - HEAD
+              - POST
+              - PUT
+              - DELETE
+            AllowedHeaders:
+              - "*"
+            ExposedHeaders:
+              - "ETag"
+            MaxAge: 3000
 
   FrontendBucketPolicy:
     Type: AWS::S3::BucketPolicy
