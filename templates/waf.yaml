@@ -134,7 +134,7 @@ Resources:
     Properties:
       LogDestinationConfigs:
         - !GetAtt WAFLogGroup.Arn
-      ResourceArn: !GetAtt WebACL.Arn
+      ResourceArn: !Ref WebACL
       LoggingFilter:
         DefaultBehavior: KEEP
         Filters:
