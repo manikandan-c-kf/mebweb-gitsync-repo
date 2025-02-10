@@ -2,12 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: WAF WebACL for ALB
 
 Resources:
-  WAFLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub "/aws/waf/${AWS::StackName}-waf-logs"
-      RetentionInDays: 30
-
   WAFLoggingRole:
     Type: AWS::IAM::Role
     Properties:
@@ -29,27 +23,6 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: !GetAtt WAFLogGroup.Arn
-
-  WAFLogResourcePolicy:
-    Type: AWS::Logs::ResourcePolicy
-    Properties:
-      PolicyName: !Sub "${AWS::StackName}-WAFLoggingPolicy"
-      PolicyDocument: !Sub |
-        {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "wafv2.amazonaws.com"
-              },
-              "Action": "logs:PutLogEvents",
-              "Resource": "${WAFLogGroup.Arn}"
-            }
-          ]
-        }
-
-
   IPSet:
     Type: AWS::WAFv2::IPSet
     Properties:
@@ -95,54 +68,11 @@ Resources:
       ResourceArn: !ImportValue LoadBalancerArn
       WebACLArn: !GetAtt WebACL.Arn
 
-  # WAFLogGroup:
-  #   Type: AWS::Logs::LogGroup
-  #   Properties:
-  #     LogGroupName: !Sub "/aws/waf/${AWS::StackName}-waf-logs"
-  #     RetentionInDays: 30
-
-  # WAFLoggingConfiguration:
-  #   Type: AWS::WAFv2::LoggingConfiguration
-  #   Properties:
-  #     LogDestinationConfigs:
-  #       - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/waf/${AWS::StackName}-waf-logs:*"
-  #     ResourceArn: !GetAtt WebACL.Arn
-  #     LoggingFilter:
-  #       DefaultBehavior: KEEP
-  #       Filters:
-  #         - Behavior: KEEP
-  #           Requirement: MEETS_ANY
-  #           Conditions:
-  #             - ActionCondition:
-  #                 Action: BLOCK
-
-  # WAFLogResourcePolicy:
-  #   Type: AWS::Logs::ResourcePolicy
-  #   Properties:
-  #     PolicyName: !Sub "${AWS::StackName}-WAFLoggingPolicy"
-  #     PolicyDocument: 
-  #       Version: "2012-10-17"
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             Service: wafv2.amazonaws.com
-  #           Action: logs:PutLogEvents
-  #           Resource: !GetAtt WAFLogGroup.Arn
-
-  WAFLoggingConfiguration:
-    Type: AWS::WAFv2::LoggingConfiguration
+  WAFLogGroup:
+    Type: AWS::Logs::LogGroup
     Properties:
-      LogDestinationConfigs:
-        - !GetAtt WAFLogGroup.Arn
-      ResourceArn: !Ref WebACL
-      LoggingFilter:
-        DefaultBehavior: KEEP
-        Filters:
-          - Behavior: KEEP
-            Requirement: MEETS_ANY
-            Conditions:
-              - ActionCondition:
-                  Action: BLOCK
+      LogGroupName: !Sub "/aws/waf/${AWS::StackName}-waf-logs"
+      RetentionInDays: 30
 
 Outputs:
   WebACLArn:
