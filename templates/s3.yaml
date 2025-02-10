@@ -43,7 +43,7 @@ Resources:
   AccessLogsBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${AccessLogsBucketName}-{AWS::StackName}"
+      BucketName: !Ref AccessLogsBucketName
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -63,7 +63,7 @@ Resources:
   AccessLogsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Sub "${AccessLogsBucket}-{AWS::StackName}"
+      Bucket: !Ref AccessLogsBucket
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -96,7 +96,7 @@ Resources:
   FrontendBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${FrontendBucketName}-{AWS::StackName}"
+      BucketName: !Ref FrontendBucketName
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: false
@@ -140,7 +140,7 @@ Resources:
   BackendArtifactBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${BackendArtifactBucketName}-{AWS::StackName}"
+      BucketName: !Ref BackendArtifactBucketName
 
   ArtifactBucketDev:
     Condition: IsDevelopment
