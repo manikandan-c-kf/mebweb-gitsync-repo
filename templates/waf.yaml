@@ -30,6 +30,26 @@ Resources:
                   - logs:PutLogEvents
                 Resource: !GetAtt WAFLogGroup.Arn
 
+  WAFLogResourcePolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName: !Sub "${AWS::StackName}-WAFLoggingPolicy"
+      PolicyDocument: !Sub |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "wafv2.amazonaws.com"
+              },
+              "Action": "logs:PutLogEvents",
+              "Resource": "${WAFLogGroup.Arn}"
+            }
+          ]
+        }
+
+
   IPSet:
     Type: AWS::WAFv2::IPSet
     Properties:
@@ -96,18 +116,18 @@ Resources:
   #             - ActionCondition:
   #                 Action: BLOCK
 
-  WAFLogResourcePolicy:
-    Type: AWS::Logs::ResourcePolicy
-    Properties:
-      PolicyName: !Sub "${AWS::StackName}-WAFLoggingPolicy"
-      PolicyDocument: 
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: wafv2.amazonaws.com
-            Action: logs:PutLogEvents
-            Resource: !GetAtt WAFLogGroup.Arn
+  # WAFLogResourcePolicy:
+  #   Type: AWS::Logs::ResourcePolicy
+  #   Properties:
+  #     PolicyName: !Sub "${AWS::StackName}-WAFLoggingPolicy"
+  #     PolicyDocument: 
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: wafv2.amazonaws.com
+  #           Action: logs:PutLogEvents
+  #           Resource: !GetAtt WAFLogGroup.Arn
 
   WAFLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
