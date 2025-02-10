@@ -101,8 +101,9 @@ Resources:
     Properties:
       Name: FrontendDeploymentBuild
       Source:
-        Type: S3
-        Location: !Sub "${FrontendCodeBucket}/source.zip"
+        # Type: S3
+        # Location: !Sub "${FrontendCodeBucket}/source.zip"
+        Type: CODEPIPELINE
       Artifacts:
         Type: CODEPIPELINE
       Environment:
