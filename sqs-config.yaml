@@ -1,7 +1,0 @@
-template-file-path: templates/sqs.yaml
-
-parameters: 
-  QueueName: BackgroundJobQueue
-  DLQName: BackgroundJobDLQ
-  MessageRetentionPeriod: 345600
-  MaxReceiveCount: 5

@@ -8,6 +8,24 @@ Parameters:
     Default: dev
 
 Resources:
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for the Load Balancer
+      VpcId: !ImportValue VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -15,7 +33,7 @@ Resources:
       Scheme: internet-facing
       Type: application
       SecurityGroups:
-        - !ImportValue SecurityGroupId
+        - !Ref LoadBalancerSecurityGroup
       Subnets:
         - !Select [0, !Split [",", !ImportValue PublicSubnetIds]]
         - !Select [1, !Split [",", !ImportValue PublicSubnetIds]]
@@ -124,3 +142,9 @@ Outputs:
     Value: !Ref TargetGroupHTTPS
     Export:
       Name: TargetGroupHTTPSArn
+
+  LoadBalancerSecurityGroupId:
+    Description: Security Group ID for Load Balancer
+    Value: !Ref LoadBalancerSecurityGroup
+    Export:
+      Name: LoadBalancerSecurityGroupId

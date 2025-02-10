@@ -1,0 +1,6 @@
+template-file-path: templates/sqs/sqs-backgroundjob.yaml
+
+parameters: 
+  QueueName: backgroundjobqueue
+  MessageRetentionPeriod: 345600
+  MaxReceiveCount: 1

@@ -1,0 +1,5 @@
+template-file-path: templates/sqs/dlq.yaml
+
+parameters:
+  DLQName: backgroundjobdlq
+  MessageRetentionPeriod: 345600
