@@ -71,7 +71,7 @@ Resources:
   WAFLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub "/aws/waf/${AWS::StackName}-waf-logs"
+      LogGroupName: !Sub "/aws/waf/${AWS::StackName}-logs"
       RetentionInDays: 30
 
 Outputs:
