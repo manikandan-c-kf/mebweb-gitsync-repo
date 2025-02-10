@@ -2,6 +2,12 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: WAF WebACL for ALB
 
 Resources:
+  WAFLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/waf/${AWS::StackName}-waf-logs"
+      RetentionInDays: 30
+
   WAFLoggingRole:
     Type: AWS::IAM::Role
     Properties:
@@ -69,17 +75,45 @@ Resources:
       ResourceArn: !ImportValue LoadBalancerArn
       WebACLArn: !GetAtt WebACL.Arn
 
-  WAFLogGroup:
-    Type: AWS::Logs::LogGroup
+  # WAFLogGroup:
+  #   Type: AWS::Logs::LogGroup
+  #   Properties:
+  #     LogGroupName: !Sub "/aws/waf/${AWS::StackName}-waf-logs"
+  #     RetentionInDays: 30
+
+  # WAFLoggingConfiguration:
+  #   Type: AWS::WAFv2::LoggingConfiguration
+  #   Properties:
+  #     LogDestinationConfigs:
+  #       - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/waf/${AWS::StackName}-waf-logs:*"
+  #     ResourceArn: !GetAtt WebACL.Arn
+  #     LoggingFilter:
+  #       DefaultBehavior: KEEP
+  #       Filters:
+  #         - Behavior: KEEP
+  #           Requirement: MEETS_ANY
+  #           Conditions:
+  #             - ActionCondition:
+  #                 Action: BLOCK
+
+  WAFLogResourcePolicy:
+    Type: AWS::Logs::ResourcePolicy
     Properties:
-      LogGroupName: !Sub "/aws/waf/${AWS::StackName}-waf-logs"
-      RetentionInDays: 30
+      PolicyName: !Sub "${AWS::StackName}-WAFLoggingPolicy"
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: wafv2.amazonaws.com
+            Action: logs:PutLogEvents
+            Resource: !GetAtt WAFLogGroup.Arn
 
   WAFLoggingConfiguration:
     Type: AWS::WAFv2::LoggingConfiguration
     Properties:
       LogDestinationConfigs:
-        - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/waf/${AWS::StackName}-waf-logs:*"
+        - !GetAtt WAFLogGroup.Arn
       ResourceArn: !GetAtt WebACL.Arn
       LoggingFilter:
         DefaultBehavior: KEEP
@@ -89,7 +123,6 @@ Resources:
             Conditions:
               - ActionCondition:
                   Action: BLOCK
-
 
 Outputs:
   WebACLArn:
