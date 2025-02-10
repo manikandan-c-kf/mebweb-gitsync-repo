@@ -140,7 +140,7 @@ Resources:
   BackendArtifactBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref BackendArtifactBucketName
+      BucketName: !Sub "${BackendArtifactBucketName}-{AWS::StackName}"
 
   ArtifactBucketDev:
     Condition: IsDevelopment
