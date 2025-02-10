@@ -52,7 +52,7 @@ Resources:
   SSLCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName: !GetAtt LoadBalancer.DNSName
+      DomainName: www.example.com # !GetAtt LoadBalancer.DNSName
       ValidationMethod: DNS
 
   TargetGroupHTTP:
