@@ -1,4 +1,4 @@
-template-file-path: templates/pipeline/sam_pipeline.yaml
+template-file-path: templates/pipeline/sam-pipeline.yaml
 
 parameters: 
   Environment: dev
