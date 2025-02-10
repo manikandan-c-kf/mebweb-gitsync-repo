@@ -37,7 +37,7 @@ Outputs:
     Description: ARN of the Dead Letter SQS Queue
     Value: !GetAtt DeadLetterQueue.Arn
     Export:
-      Name: !Sub "${AWS::StackName}-DeadLetterQueueArn"
+      Name: DeadLetterQueueArn
 
   DeadLetterQueueUrl:
     Description: URL of the Dead Letter SQS Queue

@@ -19,7 +19,7 @@ Resources:
       QueueName: !Ref QueueName
       MessageRetentionPeriod: !Ref MessageRetentionPeriod
       RedrivePolicy:
-        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        deadLetterTargetArn: !ImportValue DeadLetterQueueArn
         maxReceiveCount: !Ref MaxReceiveCount
 
 Outputs:
