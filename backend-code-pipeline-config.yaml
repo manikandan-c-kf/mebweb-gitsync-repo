@@ -4,5 +4,5 @@ parameters:
   Environment: dev
   BackendGitHubRepositoryName: manikandan-c-kf/test-mebweb-backend
   BackendGitHubBranchName: main
-  CodeStarConnectionArn: arn:aws:codeconnections:us-east-1:767397811981:connection/96833795-1cf4-40e6-9e89-56c098ee9af2
+  CodeStarConnectionArn: arn:aws:codeconnections:us-east-1:961341513566:connection/cbd1908f-af4a-42bf-8464-9fc9e8ffc11d
   ECRRepositoryName: mebweb-ecr-repository
