@@ -16,6 +16,9 @@ Parameters:
   CodeStarConnectionArn:
     Type: String
     Description: CodeStarConnectionArn
+  FrontendCodeBucket:
+    Type: String
+    Description: S3 bucket name for front end code
   
 Resources:
   FrontendCodeBuildServiceRole:
@@ -98,8 +101,8 @@ Resources:
     Properties:
       Name: FrontendDeploymentBuild
       Source:
-        BuildSpec: "buildspec.yaml"
-        Type: CODEPIPELINE
+        Type: S3
+        Location: !Sub "${FrontendCodeBucket}/source.zip"
       Artifacts:
         Type: CODEPIPELINE
       Environment:
@@ -116,19 +119,17 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: GitHubSource
+            - Name: S3Source
               ActionTypeId:
                 Category: "Source"
                 Owner: "AWS"
-                Provider: "CodeStarSourceConnection"
+                Provider: "S3"
                 Version: "1"
               OutputArtifacts:
                 - Name: SourceOutput
               Configuration:
-                BranchName: !Sub "${FrontendGitHubBranchName}"
-                ConnectionArn: !Sub ${CodeStarConnectionArn}
-                FullRepositoryId: !Sub "${FrontendGitHubRepositoryName}"
-                OutputArtifactFormat: "CODE_ZIP"
+                S3Bucket: !Ref FrontendCodeBucket
+                S3ObjectKey: "source.zip"
               RunOrder: 1
 
         - Name: BuildAndDeploy
