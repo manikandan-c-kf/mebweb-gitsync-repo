@@ -240,7 +240,7 @@ Resources:
         detail:
           bucket:
             name:
-              - !Ref FrontendCodeBucket
+              - !Ref BackendCodeBucket
       Targets:
         - Arn: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CodePipelineName}"
           Id: "CodePipelineTrigger"
