@@ -63,6 +63,48 @@ Resources:
                   - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CLOUDFRONT_ID"
                   - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/S3_BUCKET"
 
+  # FrontendCodePipelineServiceRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: codepipeline.amazonaws.com
+  #           Action: sts:AssumeRole
+  #     Policies:
+  #       - PolicyName: CodePipelinePermissions
+  #         PolicyDocument:
+  #           Version: "2012-10-17"
+  #           Statement:
+  #             - Effect: Allow
+  #               Action:
+  #                 - s3:PutObject
+  #                 - s3:GetObject
+  #                 - s3:ListBucket
+  #               Resource:
+  #                 - !Sub arn:aws:s3:::${FrontendBucketName}
+  #                 - !Sub arn:aws:s3:::${FrontendBucketName}/*
+  #             - Effect: Allow
+  #               Action:
+  #                 - codebuild:StartBuild
+  #                 - codebuild:BatchGetBuilds
+  #               Resource: "*"
+  #             - Effect: Allow
+  #               Action:
+  #                 - codestar-connections:UseConnection
+  #               Resource: !Sub "${CodeStarConnectionArn}"
+  #             - Effect: Allow
+  #               Action:
+  #                 - s3:GetObject
+  #                 - s3:GetBucketLocation
+  #                 - s3:PutObject
+  #                 - s3:ListBucket
+  #               Resource:
+  #                 - !Sub arn:aws:s3:::${FrontendCodeBucket}
+  #                 - !Sub arn:aws:s3:::${FrontendCodeBucket}/*
+
   FrontendCodePipelineServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -80,12 +122,13 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - s3:PutObject
                   - s3:GetObject
+                  - s3:GetObjectVersion  # Required for accessing specific versions
+                  - s3:GetBucketVersioning  # Required if versioning is enabled
                   - s3:ListBucket
                 Resource:
-                  - !Sub arn:aws:s3:::${FrontendBucketName}
-                  - !Sub arn:aws:s3:::${FrontendBucketName}/*
+                  - !Sub arn:aws:s3:::${FrontendCodeBucket}
+                  - !Sub arn:aws:s3:::${FrontendCodeBucket}/*
               - Effect: Allow
                 Action:
                   - codebuild:StartBuild
@@ -95,15 +138,6 @@ Resources:
                 Action:
                   - codestar-connections:UseConnection
                 Resource: !Sub "${CodeStarConnectionArn}"
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                  - s3:GetBucketLocation
-                  - s3:PutObject
-                  - s3:ListBucket
-                Resource:
-                  - !Sub arn:aws:s3:::${FrontendCodeBucket}
-                  - !Sub arn:aws:s3:::${FrontendCodeBucket}/*
 
   FrontendCodeBuildProject:
     Type: AWS::CodeBuild::Project
