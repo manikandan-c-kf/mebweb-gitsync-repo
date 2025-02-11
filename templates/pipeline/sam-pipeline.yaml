@@ -54,6 +54,7 @@ Resources:
                   - cloudformation:UpdateStack
                   - cloudformation:DeleteStack
                   - cloudformation:DescribeStackEvents
+                  - cloudformation:GetTemplateSummary
                 Resource: "*"
               - Effect: Allow
                 Action:
