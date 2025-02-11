@@ -7,3 +7,4 @@ parameters:
   FrontendBucketName: mebwbfrontendbucket 
   CodeStarConnectionArn: arn:aws:codeconnections:us-east-1:961341513566:connection/cbd1908f-af4a-42bf-8464-9fc9e8ffc11d
   FrontendCodeBucket: azuredevopsfrontend
+  CodePipelineName: Frontend-Code-Pipeline
