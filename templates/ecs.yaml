@@ -86,7 +86,7 @@ Resources:
             - !ImportValue SecurityGroupId
       LoadBalancers:
         - TargetGroupArn: !ImportValue TargetGroupArn
-          ContainerName: !Ref ECSContainerName
+          ContainerName: !Sub "${ECSContainerName}-${Environment}"
           ContainerPort: 80
 
   LogGroup:
