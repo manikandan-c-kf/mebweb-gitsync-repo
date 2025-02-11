@@ -15,6 +15,12 @@ Parameters:
     Description: CodeStarConnectionArn
   ECRRepositoryName:
     Type: String
+  BackendCodeBucket:
+    Type: String
+    Description: S3 bucket name for back end code  
+  CodePipelineName:
+    Type: String
+    Description: Name of the CodePipeline
 
 Resources:
   BackendCodeBuildServiceRole:
@@ -109,6 +115,37 @@ Resources:
                 Action:
                   - codestar-connections:UseConnection
                 Resource: !Sub "${CodeStarConnectionArn}"
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetBucketLocation
+                  - s3:PutObject
+                  - s3:ListBucket
+                  - s3:GetBucketVersioning
+                  - s3:GetObjectVersion
+                Resource:
+                  - !Sub arn:aws:s3:::${BackendCodeBucket}
+                  - !Sub arn:aws:s3:::${BackendCodeBucket}/*
+
+  EventBridgeInvokePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StartCodePipeline
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - codepipeline:StartPipelineExecution
+                Resource: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CodePipelineName}"
 
   BackendCodeBuildProject:
     Type: AWS::CodeBuild::Project
@@ -147,18 +184,17 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: GitHubSource
+            - Name: S3Source
               ActionTypeId:
                 Category: "Source"
                 Owner: "AWS"
-                Provider: "CodeStarSourceConnection"
+                Provider: "S3"
                 Version: "1"
-              Configuration:
-                BranchName: !Sub "${BackendGitHubBranchName}"
-                ConnectionArn: !Sub ${CodeStarConnectionArn}
-                FullRepositoryId: !Sub "${BackendGitHubRepositoryName}"
               OutputArtifacts:
-                - Name: SourceArtifact
+                - Name: SourceOutput
+              Configuration:
+                S3Bucket: !Ref BackendCodeBucket
+                S3ObjectKey: "azure_code.zip"
               RunOrder: 1
         - Name: Build
           Actions:
@@ -190,3 +226,22 @@ Resources:
               InputArtifacts:
                 - Name: BuildArtifact
               RunOrder: 1
+
+  S3TriggerEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "S3Trigger-${CodePipelineName}"
+      Description: "Trigger CodePipeline when a new object is uploaded to S3"
+      EventPattern:
+        source:
+          - "aws.s3"
+        detail-type:
+          - "Object Created"
+        detail:
+          bucket:
+            name:
+              - !Ref FrontendCodeBucket
+      Targets:
+        - Arn: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CodePipelineName}"
+          Id: "CodePipelineTrigger"
+          RoleArn: !GetAtt EventBridgeInvokePipelineRole.Arn
