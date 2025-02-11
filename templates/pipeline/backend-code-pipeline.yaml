@@ -191,7 +191,7 @@ Resources:
                 Provider: "S3"
                 Version: "1"
               OutputArtifacts:
-                - Name: SourceOutput
+                - Name: SourceArtifact
               Configuration:
                 S3Bucket: !Ref BackendCodeBucket
                 S3ObjectKey: "azure_code.zip"
