@@ -67,6 +67,7 @@ Resources:
                   - lambda:CreateFunction
                   - lambda:DeleteFunction
                   - lambda:TagResource 
+                  - lambda:ListTags
                 Resource: "*"
               - Effect: Allow
                 Action:
