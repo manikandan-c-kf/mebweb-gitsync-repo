@@ -70,7 +70,7 @@ Resources:
     Properties:
       ServiceName: !Sub "${AWS::StackName}-service-${Environment}"
       Cluster: !Ref ECSCluster
-      DesiredCount: 0
+      DesiredCount: 1
       LaunchType: FARGATE
       TaskDefinition: !Ref ECSTaskDefinition
       DeploymentConfiguration:
@@ -84,6 +84,10 @@ Resources:
             - !Select [1, !Split [",", !ImportValue PrivateSubnetIds]]
           SecurityGroups:
             - !ImportValue SecurityGroupId
+          LoadBalancers:
+          - TargetGroupArn: !ImportValue TargetGroupArn
+            ContainerName: !Ref ECSContainerName
+            ContainerPort: 80
 
   LogGroup:
     Type: AWS::Logs::LogGroup
