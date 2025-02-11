@@ -33,6 +33,7 @@ Resources:
                   - ecr:BatchCheckLayerAvailability
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
+                  - s3:GetObject  # Needed for ECR layers
                 Resource: "*"
 
   ECSCluster:
