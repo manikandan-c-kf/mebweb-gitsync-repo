@@ -8,6 +8,9 @@ Parameters:
   ECSContainerName:
     Type: String
     Description: Name of the ECS container
+  ECRRepoName:
+    Type: String
+    Description: Name of the ECR Repository
 
 Resources:
   TaskExecutionRole:
@@ -54,7 +57,8 @@ Resources:
       TaskRoleArn: !GetAtt TaskExecutionRole.Arn
       ContainerDefinitions:
         - Name: !Sub "${ECSContainerName}-${Environment}"
-          Image: !ImportValue ECRRepositoryURI
+          # Image: !ImportValue ECRRepositoryURI
+          Image: !Sub "${AWS::AccountId}-.dkr.ecr.-${AWS::Region}.amazonaws.com/${ECRRepoName}-${Environment}"
           PortMappings:
             - ContainerPort: 80
               Protocol: tcp
