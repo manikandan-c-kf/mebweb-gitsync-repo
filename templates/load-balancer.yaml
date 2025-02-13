@@ -58,7 +58,7 @@ Resources:
       ProtocolVersion: HTTP1
       VpcId: !ImportValue VpcId
       TargetType: ip
-      HealthCheckPath: "/health"
+      HealthCheckPath: "/"
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 30
       HealthCheckTimeoutSeconds: 5
