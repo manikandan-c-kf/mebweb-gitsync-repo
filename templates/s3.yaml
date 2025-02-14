@@ -160,6 +160,24 @@ Resources:
     Properties:
       BucketName: !Sub 'codepipeline-${AWS::Region}-${AWS::AccountId}-prod'
 
+  SQSLambdaArtifactBucketDev:
+    Condition: IsDevelopment
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'sqs-lambda-codepipeline-${AWS::Region}-${AWS::AccountId}-dev'
+
+  SQSLambdaArtifactBucketStage:
+    Condition: IsStaging
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'sqs-lambda-codepipeline-${AWS::Region}-${AWS::AccountId}-stage'
+
+  SQSLambdaArtifactBucketProd:
+    Condition: IsProduction
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'sqs-lambda-codepipeline-${AWS::Region}-${AWS::AccountId}-prod'
+
 Outputs:
   FrontendBucketName:
     Description: Name of the frontend bucket
@@ -196,3 +214,18 @@ Outputs:
     Value: !Ref ArtifactBucketProd
     Export:
       Name: ArtifactBucketProd
+  SQSLambdaArtifactBucketDevName:
+    Condition: IsDevelopment
+    Value: !Ref SQSLambdaArtifactBucketDev
+    Export:
+      Name: SQSLambdaArtifactBucketDev
+  SQSLambdaArtifactBucketStageName:
+    Condition: IsStaging
+    Value: !Ref SQSLambdaArtifactBucketStage
+    Export:
+      Name: SQSLambdaArtifactBucketStage
+  SQSLambdaArtifactBucketProdName:
+    Condition: IsProduction
+    Value: !Ref SQSLambdaArtifactBucketProd
+    Export:
+      Name: SQSLambdaArtifactBucketProd

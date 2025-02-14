@@ -21,7 +21,7 @@ Conditions:
   IsProduction: !Equals [!Ref Environment, production]
 
 Resources:
-  SAMCodeBuildRole:
+  SQSLambdaSAMCodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -76,7 +76,7 @@ Resources:
                   - tag:UntagResources
                 Resource: "*"
 
-  SAMCodePipelineRole:
+  SQSLambdaSAMCodePipelineRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -106,7 +106,7 @@ Resources:
                   - codestar-connections:UseConnection
                 Resource: !Ref CodeStarConnectionArn
 
-  SAMCodeBuildProjectDev:
+  SQSLambdaSAMCodeBuildProjectDev:
     Type: AWS::CodeBuild::Project
     Condition: IsDevelopment
     Properties:
@@ -120,14 +120,14 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
         Type: LINUX_CONTAINER
-      ServiceRole: !Ref SAMCodeBuildRole
+      ServiceRole: !Ref SQSLambdaSAMCodeBuildRole
 
-  SAMCodePipeline:
+  SQSLambdaSAMCodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Condition: IsDevelopment
     Properties:
-      Name: !Sub "SAM-Code-Pipeline-${Environment}"
-      RoleArn: !GetAtt SAMCodePipelineRole.Arn
+      Name: !Sub "SQS-Lambda-SAM-Code-Pipeline-${Environment}"
+      RoleArn: !GetAtt SQSLambdaSAMCodePipelineRole.Arn
       Stages:
         - Name: Source
           Actions:
@@ -159,13 +159,13 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               Configuration:
-                ProjectName: !Ref SAMCodeBuildProjectDev
+                ProjectName: !Ref SQSLambdaSAMCodeBuildProjectDev
               RunOrder: 1
       ArtifactStore:
         Type: S3
-        Location: !ImportValue ArtifactBucketDev 
+        Location: !ImportValue SQSLambdaArtifactBucketDev 
 
-  SAMCodeBuildProjectStage:
+  SQSLambdaSAMCodeBuildProjectStage:
     Type: AWS::CodeBuild::Project
     Condition: IsStaging
     Properties:
@@ -179,14 +179,14 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
         Type: LINUX_CONTAINER
-      ServiceRole: !Ref SAMCodeBuildRole
+      ServiceRole: !Ref SQSLambdaSAMCodeBuildRole
 
-  SAMCodePipelineStage:
+  SQSLambdaSAMCodePipelineStage:
     Type: AWS::CodePipeline::Pipeline
     Condition: IsStaging
     Properties:
-      Name: !Sub "SAM-Code-Pipeline-${Environment}"
-      RoleArn: !GetAtt SAMCodePipelineRole.Arn
+      Name: !Sub "SQS-Lambda-SAM-Code-Pipeline-${Environment}"
+      RoleArn: !GetAtt SQSLambdaSAMCodePipelineRole.Arn
       Stages:
         - Name: Source
           Actions:
@@ -218,13 +218,13 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               Configuration:
-                ProjectName: !Ref SAMCodeBuildProjectStage
+                ProjectName: !Ref SQSLambdaSAMCodeBuildProjectStage
               RunOrder: 1
       ArtifactStore:
         Type: S3
-        Location: !ImportValue ArtifactBucketStage 
+        Location: !ImportValue SQSLambdaArtifactBucketStage 
 
-  SAMCodeBuildProjectProd:
+  SQSLambdaSAMCodeBuildProjectProd:
     Type: AWS::CodeBuild::Project
     Condition: IsProduction
     Properties:
@@ -238,14 +238,14 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
         Type: LINUX_CONTAINER
-      ServiceRole: !Ref SAMCodeBuildRole
+      ServiceRole: !Ref SQSLambdaSAMCodeBuildRole
 
-  SAMCodePipelineProd:
+  SQSLambdaSAMCodePipelineProd:
     Type: AWS::CodePipeline::Pipeline
     Condition: IsProduction
     Properties:
-      Name: !Sub "SAM-Code-Pipeline-${Environment}"
-      RoleArn: !GetAtt SAMCodePipelineRole.Arn
+      Name: !Sub "SQS-Lambda-SAM-Code-Pipeline-${Environment}"
+      RoleArn: !GetAtt SQSLambdaSAMCodePipelineRole.Arn
       Stages:
         - Name: Source
           Actions:
@@ -277,8 +277,8 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               Configuration:
-                ProjectName: !Ref SAMCodeBuildProjectProd
+                ProjectName: !Ref SQSLambdaSAMCodeBuildProjectProd
               RunOrder: 1
       ArtifactStore:
         Type: S3
-        Location: !ImportValue ArtifactBucketProd
+        Location: !ImportValue SQSLambdaArtifactBucketProd
