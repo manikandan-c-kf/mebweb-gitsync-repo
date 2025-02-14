@@ -110,7 +110,7 @@ Resources:
     Type: AWS::CodeBuild::Project
     Condition: IsDevelopment
     Properties:
-      Name: SAMBuild
+      Name: SQSLambdaSAMBuild
       Source:
         BuildSpec: "buildspec.yaml"
         Type: CODEPIPELINE
@@ -169,7 +169,7 @@ Resources:
     Type: AWS::CodeBuild::Project
     Condition: IsStaging
     Properties:
-      Name: SAMBuild
+      Name: SQSLambdaSAMBuild
       Source:
         BuildSpec: "buildspec.yaml"
         Type: CODEPIPELINE
@@ -228,7 +228,7 @@ Resources:
     Type: AWS::CodeBuild::Project
     Condition: IsProduction
     Properties:
-      Name: SAMBuild
+      Name: SQSLambdaSAMBuild
       Source:
         BuildSpec: "buildspec.yaml"
         Type: CODEPIPELINE
