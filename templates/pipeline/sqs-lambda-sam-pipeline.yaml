@@ -62,14 +62,7 @@ Resources:
                 Resource: "*"
               - Effect: Allow
                 Action:
-                  - lambda:GetFunction
-                  - lambda:UpdateFunctionCode
-                  - lambda:CreateFunction
-                  - lambda:DeleteFunction
-                  - lambda:TagResource 
-                  - lambda:ListTags
-                  - lambda:CreateEventSourceMapping  # Added permission
-                  - lambda:DeleteEventSourceMapping  # Optional: For cleanup
+                  - lambda:*
                 Resource: "*"
               - Effect: Allow
                 Action:
