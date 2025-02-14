@@ -68,6 +68,8 @@ Resources:
                   - lambda:DeleteFunction
                   - lambda:TagResource 
                   - lambda:ListTags
+                  - lambda:CreateEventSourceMapping  # Added permission
+                  - lambda:DeleteEventSourceMapping  # Optional: For cleanup
                 Resource: "*"
               - Effect: Allow
                 Action:
