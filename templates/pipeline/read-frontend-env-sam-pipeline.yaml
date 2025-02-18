@@ -1,0 +1,284 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  ReadFrontendENVGitHubRepositoryName:
+    Type: String
+    Description: The name of the GitHub repository
+  ReadFrontendENVGitHubBranchName:
+    Type: String
+    Description: The branch in the GitHub repository to deploy from
+  CodeStarConnectionArn:
+    Type: String
+    Description: The CodeStar connection ARN for the GitHub repository
+  Environment:
+    Type: String
+    Description: Environment to deploy (dev, staging, production).
+
+Conditions:
+  IsDevelopment: !Equals [!Ref Environment, dev]
+  IsStaging: !Equals [!Ref Environment, staging]
+  IsProduction: !Equals [!Ref Environment, production]
+
+Resources:
+  ReadFrontendENVCodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodeBuildPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                  - codepipeline:*
+                  - logs:*
+                  - cloudwatch:*
+                  - iam:*
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DescribeStacks
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:ListStacks
+                  - cloudformation:UpdateStack
+                  - cloudformation:DeleteStack
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:GetTemplateSummary
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - lambda:GetFunction
+                  - lambda:UpdateFunctionCode
+                  - lambda:CreateFunction
+                  - lambda:DeleteFunction
+                  - lambda:TagResource 
+                  - lambda:ListTags
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - tag:GetResources
+                  - tag:TagResources
+                  - tag:UntagResources
+                Resource: "*"
+
+  ReadFrontendENVCodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodePipelinePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                  - codebuild:*
+                  - codecommit:*
+                  - codedeploy:*
+                  - codepipeline:*
+                  - cloudformation:*
+                  - iam:*
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                Resource: !Ref CodeStarConnectionArn
+
+  ReadFrontendENVCodeBuildProjectDev:
+    Type: AWS::CodeBuild::Project
+    Condition: IsDevelopment
+    Properties:
+      Name: ReadFrontendENVBuild
+      Source:
+        BuildSpec: "buildspec.yaml"
+        Type: CODEPIPELINE
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+        Type: LINUX_CONTAINER
+      ServiceRole: !Ref ReadFrontendENVCodeBuildRole
+
+  ReadFrontendENVCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Condition: IsDevelopment
+    Properties:
+      Name: !Sub "ReadFrontendENV-Code-Pipeline-${Environment}"
+      RoleArn: !GetAtt ReadFrontendENVCodePipelineRole.Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHubSource
+              ActionTypeId:
+                Category: "Source"
+                Owner: "AWS"
+                Provider: "CodeStarSourceConnection"
+                Version: "1"
+              OutputArtifacts:
+                - Name: SourceOutput
+              Configuration:
+                BranchName: !Sub "${ReadFrontendENVGitHubBranchName}"
+                ConnectionArn: !Sub ${CodeStarConnectionArn}
+                FullRepositoryId: !Sub "${ReadFrontendENVGitHubRepositoryName}"
+                OutputArtifactFormat: "CODE_ZIP"
+              RunOrder: 1
+
+        - Name: BuildAndDeploy
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+              Configuration:
+                ProjectName: !Ref ReadFrontendENVCodeBuildProjectDev
+              RunOrder: 1
+      ArtifactStore:
+        Type: S3
+        Location: !ImportValue FrontendENVArtifactBucketDev 
+
+  ReadFrontendENVCodeBuildProjectStage:
+    Type: AWS::CodeBuild::Project
+    Condition: IsStaging
+    Properties:
+      Name: ReadFrontendENVBuild
+      Source:
+        BuildSpec: "buildspec.yaml"
+        Type: CODEPIPELINE
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+        Type: LINUX_CONTAINER
+      ServiceRole: !Ref ReadFrontendENVCodeBuildRole
+
+  ReadFrontendENVCodePipelineStage:
+    Type: AWS::CodePipeline::Pipeline
+    Condition: IsStaging
+    Properties:
+      Name: !Sub "ReadFrontendENV-Code-Pipeline-${Environment}"
+      RoleArn: !GetAtt ReadFrontendENVCodePipelineRole.Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHubSource
+              ActionTypeId:
+                Category: "Source"
+                Owner: "AWS"
+                Provider: "CodeStarSourceConnection"
+                Version: "1"
+              OutputArtifacts:
+                - Name: SourceOutput
+              Configuration:
+                BranchName: !Sub "${ReadFrontendENVGitHubBranchName}"
+                ConnectionArn: !Sub ${CodeStarConnectionArn}
+                FullRepositoryId: !Sub "${ReadFrontendENVGitHubRepositoryName}"
+                OutputArtifactFormat: "CODE_ZIP"
+              RunOrder: 1
+
+        - Name: BuildAndDeploy
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+              Configuration:
+                ProjectName: !Ref ReadFrontendENVCodeBuildProjectStage
+              RunOrder: 1
+      ArtifactStore:
+        Type: S3
+        Location: !ImportValue FrontendENVArtifactBucketStage 
+
+  ReadFrontendENVCodeBuildProjectProd:
+    Type: AWS::CodeBuild::Project
+    Condition: IsProduction
+    Properties:
+      Name: ReadFrontendENVBuild
+      Source:
+        BuildSpec: "buildspec.yaml"
+        Type: CODEPIPELINE
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+        Type: LINUX_CONTAINER
+      ServiceRole: !Ref ReadFrontendENVCodeBuildRole
+
+  ReadFrontendENVCodePipelineProd:
+    Type: AWS::CodePipeline::Pipeline
+    Condition: IsProduction
+    Properties:
+      Name: !Sub "ReadFrontendENV-Code-Pipeline-${Environment}"
+      RoleArn: !GetAtt ReadFrontendENVCodePipelineRole.Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHubSource
+              ActionTypeId:
+                Category: "Source"
+                Owner: "AWS"
+                Provider: "CodeStarSourceConnection"
+                Version: "1"
+              OutputArtifacts:
+                - Name: SourceOutput
+              Configuration:
+                BranchName: !Sub "${ReadFrontendENVGitHubBranchName}"
+                ConnectionArn: !Sub ${CodeStarConnectionArn}
+                FullRepositoryId: !Sub "${ReadFrontendENVGitHubRepositoryName}"
+                OutputArtifactFormat: "CODE_ZIP"
+              RunOrder: 1
+
+        - Name: BuildAndDeploy
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+              Configuration:
+                ProjectName: !Ref ReadFrontendENVCodeBuildProjectProd
+              RunOrder: 1
+      ArtifactStore:
+        Type: S3
+        Location: !ImportValue FrontendENVArtifactBucketProd

@@ -160,6 +160,24 @@ Resources:
     Properties:
       BucketName: !Sub 'codepipeline-${AWS::Region}-${AWS::AccountId}-prod'
 
+  FrontendENVArtifactBucketDev:
+    Condition: IsDevelopment
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'read-frontend-env-codepipeline-${AWS::Region}-${AWS::AccountId}-dev'
+
+  FrontendENVArtifactBucketStage:
+    Condition: IsStaging
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'read-frontend-env-codepipeline-${AWS::Region}-${AWS::AccountId}-stage'
+
+  FrontendENVArtifactBucketProd:
+    Condition: IsProduction
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'read-frontend-env-codepipeline-${AWS::Region}-${AWS::AccountId}-prod'
+
   SQSLambdaArtifactBucketDev:
     Condition: IsDevelopment
     Type: AWS::S3::Bucket
@@ -229,3 +247,18 @@ Outputs:
     Value: !Ref SQSLambdaArtifactBucketProd
     Export:
       Name: SQSLambdaArtifactBucketProd
+  FrontendENVArtifactBucketDev:
+    Condition: IsDevelopment
+    Value: !Ref FrontendENVArtifactBucketDev
+    Export:
+      Name: FrontendENVArtifactBucketDev
+  FrontendENVArtifactBucketStage:
+    Condition: IsStaging
+    Value: !Ref FrontendENVArtifactBucketStage
+    Export:
+      Name: FrontendENVArtifactBucketStage
+  FrontendENVArtifactBucketProd:
+    Condition: IsProduction
+    Value: !Ref FrontendENVArtifactBucketProd
+    Export:
+      Name: FrontendENVArtifactBucketProd
